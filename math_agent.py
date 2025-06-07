@@ -304,21 +304,32 @@ def get_final_answer(question, index, questions, answers, model, gemini_key, sea
     return result["answer"]
 
 # Example usage
+
+
 if __name__ == "__main__":
-    # Example of how to use the agent
-    GEMINI_API_KEY = "AIzaSyA-Y1bbM0aofvo_roKegn3Z_37eAw2ZpWc"
-    SEARCH_API_KEY = "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"  # Optional
-    
-    # Create agent
-    agent = create_math_agent(GEMINI_API_KEY, SEARCH_API_KEY)
-    
-    # Ask a question
+
+# Step 1: Load the saved index and data
+    index = faiss.read_index("gsm8k_faiss.index")
+
+    with open("questions.json", "r") as f:
+        questions = json.load(f)
+
+    with open("answers.json", "r") as f:
+        answers = json.load(f)
+
+    # Step 2: Create the agent
+    agent = MathAgent(gemini_api_key="AIzaSyA-Y1bbM0aofvo_roKegn3Z_37eAw2ZpWc")
+
+    # Step 3: Manually inject the vector DB and data
+    agent.index = index
+    agent.questions = questions
+    agent.answers = answers
+
+    # Step 4: Ask your question
     question = "What is 25% of 80?"
     result = agent.get_answer(question)
-    
+
     print(f"Question: {question}")
     print(f"Answer: {result['answer']}")
     print(f"Success: {result['success']}")
     print(f"Used Context: {result['context_used']}")
-  
-
