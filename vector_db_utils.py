@@ -25,7 +25,7 @@ def build_and_save_vector_db():
     questions = [item['question'] for item in dataset]
     answers = [item['answer'] for item in dataset]
 
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    model = SentenceTransformer("all-MiniLM-L6-v2", device='cpu')
     embeddings = model.encode(questions, show_progress_bar=True).astype('float32')
 
     index = faiss.IndexFlatL2(embeddings.shape[1])
