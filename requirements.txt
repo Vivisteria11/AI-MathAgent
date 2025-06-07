@@ -1,8 +1,9 @@
-faiss-cpu
-sentence-transformers==2.2.2
-torch==2.7.1
 streamlit
+sentence-transformers
+faiss-cpu
 datasets
-requests
 google-generativeai
-
+numpy
+pandas
+requests
+torch
