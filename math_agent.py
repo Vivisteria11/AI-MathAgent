@@ -320,7 +320,5 @@ if __name__ == "__main__":
     print(f"Answer: {result['answer']}")
     print(f"Success: {result['success']}")
     print(f"Used Context: {result['context_used']}")
-    except Exception as e:
-        st.error(f"Error saving feedback: {str(e)}")
-        return False
+  
 
