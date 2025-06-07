@@ -1,3 +1,9 @@
+import os
+os.environ['TORCH_CLASSES_IGNORE_MISSING'] = '1'
+
+# Alternative: Set Streamlit to ignore torch.classes in file watching
+import streamlit as st
+st.set_option('server.fileWatcherType', 'none')  # Disable file watcher
 import streamlit as st
 import pandas as pd
 from datetime import datetime
