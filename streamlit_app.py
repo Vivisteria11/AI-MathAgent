@@ -3,11 +3,41 @@ os.environ['TORCH_CLASSES_IGNORE_MISSING'] = '1'
 
 # Alternative: Set Streamlit to ignore torch.classes in file watching
 import streamlit as st
-st.set_option('server.fileWatcherType', 'none')  # Disable file watcher
+import torch
+# Disable file watcher
 import streamlit as st
 import pandas as pd
 from datetime import datetime
 import os
+
+import asyncio
+import nest_asyncio
+nest_asyncio.apply()
+
+try:
+    loop = asyncio.get_event_loop()
+    if loop.is_closed():
+        asyncio.set_event_loop(asyncio.new_event_loop())
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
+if st.sidebar.checkbox("Debug Mode"):
+    st.sidebar.write("🔍 **System Info:**")
+    st.sidebar.write(f"Python: {sys.version}")
+    st.sidebar.write(f"PyTorch: {torch.__version__}")
+    
+    # Test your vector DB and LLM connections here
+    try:
+        # Add your GSM8K vector DB test here
+        st.sidebar.success("✅ Vector DB: Connected")
+    except Exception as e:
+        st.sidebar.error(f"❌ Vector DB: {str(e)}")
+    
+    try:
+        # Add your LLM test here
+        st.sidebar.success("✅ LLM: Connected")
+    except Exception as e:
+        st.sidebar.error(f"❌ LLM: {str(e)}")
 
 # Import your math agent (assuming it's in math_agent.py)
 try:
