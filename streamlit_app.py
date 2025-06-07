@@ -1,5 +1,7 @@
 import os
 os.environ["STREAMLIT_WATCH_USE_POLLING"] = "true"
+import streamlit.web.bootstrap
+streamlit.web.bootstrap._on_change = lambda *args, **kwargs: None
 import streamlit as st
 from vector_db_utils import load_vector_db, get_final_answer, save_feedback
 import os
