@@ -19,7 +19,18 @@ An interactive math tutor chatbot powered by the **Gemini API** and **GSM8K data
 
 https://ai-mathagent-bvzmdbqxktlfufgk3dpxc6.streamlit.app/
 ---
+## API Key Handling
 
+For demonstration, the API key is currently hardcoded in `streamlit_app.py` for immediate testing.
+
+In real applications, API keys should be stored securely using environment variables or secret managers.
+
+Due to deployment constraints, .env file did not work reliably for this demo.
+
+Future updates may include:
+
+- Allowing users to enter their own API keys dynamically.
+- Using proper secret storage techniques.
 ## 🛠️ Tech Stack
 
 - **Frontend:** Streamlit  
@@ -42,13 +53,14 @@ cd math-tutor-ai
 pip install -r requirements.txt
 
 3. Set your API key
+
 Open app.py and insert your Gemini API key:
 GEMINI_API_KEY = "your-google-api-key"
 TAVILY_API_KEY = None  # Optional, leave as None if not used
 
-4. Run the app
+5. Run the app
 streamlit run app.py
-5. (Optional) Expose with ngrok
+6. (Optional) Expose with ngrok
 For Colab or remote sharing:
 from pyngrok import ngrok
 ngrok.connect(8501)
