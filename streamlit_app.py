@@ -5,11 +5,8 @@ import torch
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-from dotenv import load_dotenv
-load_dotenv()  # Load .env variables
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-TAVILY_API_KEY = os.getenv("TAVILY_API_KEY") 
+GEMINI_API_KEY = "AIzaSyA-Y1bbM0aofvo_roKegn3Z_37eAw2ZpWc"
+TAVILY_API_KEY = None  # Optional, can be set if needed
 
 
 
