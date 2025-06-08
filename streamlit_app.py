@@ -153,7 +153,7 @@ def main():
             with st.spinner("Solving..."):
                 try:
                     result = st.session_state.math_agent.get_answer(user_input)
-                    st.write("Debug result:", result)  # Remove this after testing
+                    # st.write("Debug result:", result)  # Remove this after testing
                     response = result.get("answer", "❌ No answer.")
                     st.markdown(response)
 
