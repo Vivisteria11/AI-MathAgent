@@ -35,7 +35,7 @@ https://ai-mathagent-d5fcvp8f7qcd7ajtyxx3ik.streamlit.app/
 
 ### 1. Clone the repository
 
-git clone https://github.com/your-username/math-tutor-ai.git
+git clone https://github.com/your-username/AI-MathAgent.git
 
 cd math-tutor-ai
 
