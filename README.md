@@ -11,13 +11,13 @@ An interactive math tutor chatbot powered by the **Gemini API** and **GSM8K data
 - 🧠 Context-aware reasoning from the GSM8K dataset
 - 👍👎 Feedback collection for continuous improvement
 - 📄 CSV download of all feedback logs
-- 🌐 Deployed via ngrok (for local + public access)
+- 🌐 Deployed via steamlit
 
 ---
 
 ## 🚀 Demo
 
-https://53a6-34-173-34-145.ngrok-free.app/
+https://ai-mathagent-d5fcvp8f7qcd7ajtyxx3ik.streamlit.app/
 
 ---
 
