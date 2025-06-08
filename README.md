@@ -17,8 +17,7 @@ An interactive math tutor chatbot powered by the **Gemini API** and **GSM8K data
 
 ## 🚀 Demo
 
-https://ai-mathagent-d5fcvp8f7qcd7ajtyxx3ik.streamlit.app/
-
+https://ai-mathagent-bvzmdbqxktlfufgk3dpxc6.streamlit.app/
 ---
 
 ## 🛠️ Tech Stack
