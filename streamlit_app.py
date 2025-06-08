@@ -1,3 +1,16 @@
+"""
+NOTE: For demonstration purposes, the API key is hardcoded here to allow immediate testing
+and avoid environment configuration issues.
+
+In production or real-world projects, API keys should NEVER be hardcoded. Instead, using
+environment variables is better.
+
+Due to deployment constraints and .env issues encountered, this demo uses a hardcoded key.
+
+Future improvements:
+- Allow users to input their own API keys dynamically via the UI.
+- Integrate proper secure key management.
+"""
 import os
 os.environ['TORCH_CLASSES_IGNORE_MISSING'] = '1'
 
