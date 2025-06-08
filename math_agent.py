@@ -1,3 +1,4 @@
+
 import json
 import os
 import requests
@@ -24,7 +25,7 @@ class MathAgent:
         self.questions = []
         self.answers = []
         self._load_components()
-    
+
     def _load_components(self):
         """Load all necessary components"""
         try:
@@ -32,39 +33,39 @@ class MathAgent:
             self._load_or_build_vector_db()
         except Exception as e:
             print(f"Error loading components: {e}")
-    
+
     # Guardrails
     def input_guardrail(self, question):
         """Validate input question"""
         disallowed_keywords = ["hack", "cheat", "game", "politics"]
-        
+
         if not question or not question.strip():
             return False, "Question cannot be empty."
-        
+
         if any(word in question.lower() for word in disallowed_keywords):
             return False, "Only math-related educational questions are allowed."
-        
+
         if len(question) > 500:
             return False, "Question is too long. Please keep it under 500 characters."
-        
+
         return True, question.strip()
 
     def output_guardrail(self, answer):
         """Validate output answer"""
         if not answer or not answer.strip():
             return False, "Sorry, we couldn't generate a valid answer."
-        
+
         problematic_phrases = [
-            "I'm not sure", 
-            "hallucination", 
-            "I cannot", 
+            "I'm not sure",
+            "hallucination",
+            "I cannot",
             "I don't know",
             "unable to provide"
         ]
-        
+
         if any(phrase in answer.lower() for phrase in problematic_phrases):
             return False, "Sorry, we couldn't confidently generate an answer."
-        
+
         return True, answer.strip()
 
     # Vector DB operations
@@ -72,36 +73,36 @@ class MathAgent:
         """Build vector database from GSM8K dataset"""
         if faiss is None:
             raise ImportError("FAISS is required. Install with: pip install faiss-cpu")
-        
+
         try:
             print("Loading dataset...")
             if limit:
                 dataset = load_dataset("gsm8k", "main", split=f"train[:{limit}]")
             else:
                 dataset = load_dataset("gsm8k", "main")["train"]
-            
+
             questions = [item['question'] for item in dataset]
             answers = [item['answer'] for item in dataset]
-            
+
             print("Generating embeddings...")
             embeddings = self.model.encode(questions, show_progress_bar=True).astype('float32')
-            
+
             print("Building FAISS index...")
             index = faiss.IndexFlatL2(embeddings.shape[1])
             index.add(embeddings)
-            
+
             # Save to files
             faiss.write_index(index, "gsm8k_faiss.index")
-            
+
             with open("questions.json", "w") as f:
                 json.dump(questions, f)
-            
+
             with open("answers.json", "w") as f:
                 json.dump(answers, f)
-            
+
             print(f"Vector database built with {len(questions)} examples")
             return True
-        
+
         except Exception as e:
             print(f"Error building vector database: {e}")
             return False
@@ -111,27 +112,27 @@ class MathAgent:
         if faiss is None:
             print("Warning: FAISS not available. Vector search disabled.")
             return
-        
+
         try:
             # Try to load existing files
-            if (os.path.exists("gsm8k_faiss.index") and 
-                os.path.exists("questions.json") and 
+            if (os.path.exists("gsm8k_faiss.index") and
+                os.path.exists("questions.json") and
                 os.path.exists("answers.json")):
-                
+
                 self.index = faiss.read_index("gsm8k_faiss.index")
-                
+
                 with open("questions.json", "r") as f:
                     self.questions = json.load(f)
-                
+
                 with open("answers.json", "r") as f:
                     self.answers = json.load(f)
-                
+
                 print(f"Loaded vector database with {len(self.questions)} examples")
             else:
                 print("Vector database not found. Building new one...")
                 if self.build_and_save_vector_db(limit=1000):  # Limit for faster setup
                     self._load_or_build_vector_db()  # Recursive call to load
-        
+
         except Exception as e:
             print(f"Error loading vector database: {e}")
 
@@ -139,18 +140,18 @@ class MathAgent:
         """Query vector database for similar questions"""
         if self.index is None or not self.questions:
             return ""
-        
+
         try:
             query_embedding = self.model.encode([query]).astype('float32')
             D, I = index.search(query_embedding, k=top_k)
-            
+
             context_parts = []
             for i, idx in enumerate(I[0]):
                 if idx < len(self.questions):
                     context_parts.append(f"Example {i+1}:\nQ: {self.questions[idx]}\nA: {self.answers[idx]}")
-            
+
             return "\n\n".join(context_parts)
-        
+
         except Exception as e:
             print(f"Error querying vector database: {e}")
             return ""
@@ -161,7 +162,7 @@ class MathAgent:
         try:
             genai.configure(api_key=self.gemini_api_key)
             model = genai.GenerativeModel("gemini-2.0-flash-exp")
-            
+
             prompt = f"""You are a helpful math tutor. Answer the following question step by step using the provided examples as guidance.
 
 ### Examples from similar problems:
@@ -177,7 +178,7 @@ class MathAgent:
 - If the question is not math-related, politely redirect to math topics
 
 ### Answer:"""
-            
+
             response = model.generate_content(
                 prompt,
                 generation_config=genai.types.GenerationConfig(
@@ -185,9 +186,9 @@ class MathAgent:
                     max_output_tokens=1000,
                 )
             )
-            
+
             return response.text.strip() if response.text else "No response generated."
-        
+
         except Exception as e:
             return f"Error generating answer: {str(e)}"
 
@@ -196,7 +197,7 @@ class MathAgent:
         """Fallback web search using Tavily API"""
         if not self.search_api_key:
             return "No additional context available. Please try rephrasing your question."
-        
+
         try:
             url = "https://api.tavily.com/search"
             headers = {"Authorization": f"Bearer {self.search_api_key}"}
@@ -205,13 +206,13 @@ class MathAgent:
                 "include_answer": True,
                 "max_results": 3
             }
-            
+
             response = requests.post(url, headers=headers, json=payload, timeout=10)
             response.raise_for_status()
-            
+
             result = response.json()
             return result.get("answer", "No relevant result found.")
-        
+
         except Exception as e:
             return f"Web search unavailable: {str(e)}"
 
@@ -226,10 +227,10 @@ class MathAgent:
                 "answer": filtered_question,
                 "context_used": False
             }
-        
+
         # Get context from vector DB
         context = self.query_vector_db(filtered_question)
-        
+
         # If no context available, try web search
         if not context.strip():
             if self.search_api_key:
@@ -246,13 +247,13 @@ class MathAgent:
                     "answer": "Sorry, I couldn't find similar examples. Please try rephrasing your math question.",
                     "context_used": False
                 }
-        
+
         # Generate answer using Gemini with RAG
         answer = self.query_gemini_rag(filtered_question, context)
-        
+
         # Output validation
         valid_output, safe_answer = self.output_guardrail(answer)
-        
+
         return {
             "success": valid_output,
             "answer": safe_answer,
@@ -270,18 +271,18 @@ class MathAgent:
                 'answer': answer,
                 'feedback': feedback
             }
-            
+
             # Append to CSV file
             import pandas as pd
             df = pd.DataFrame([feedback_data])
-            
+
             if os.path.exists("feedback_log.csv"):
                 df.to_csv("feedback_log.csv", mode='a', header=False, index=False)
             else:
                 df.to_csv("feedback_log.csv", mode='w', header=True, index=False)
-            
+
             return True
-        
+
         except Exception as e:
             print(f"Error saving feedback: {e}")
             return False
@@ -299,7 +300,7 @@ def get_final_answer(question, index, questions, answers, model, gemini_key, sea
     agent.questions = questions
     agent.answers = answers
     agent.model = model
-    
+
     result = agent.get_answer(question)
     return result["answer"]
 
@@ -326,10 +327,11 @@ if __name__ == "__main__":
     agent.answers = answers
 
     # Step 4: Ask your question
-    question = "What is 25% of 80?"
+    question = "Who is the president of America?"
     result = agent.get_answer(question)
 
     print(f"Question: {question}")
     print(f"Answer: {result['answer']}")
     print(f"Success: {result['success']}")
     print(f"Used Context: {result['context_used']}")
+
