@@ -1,4 +1,3 @@
-
 import json
 import os
 import requests
@@ -88,11 +87,11 @@ class MathAgent:
             embeddings = self.model.encode(questions, show_progress_bar=True).astype('float32')
 
             print("Building FAISS index...")
-            index = faiss.IndexFlatL2(embeddings.shape[1])
-            index.add(embeddings)
+            self.index = faiss.IndexFlatL2(embeddings.shape[1])
+            self.index.add(embeddings)
 
             # Save to files
-            faiss.write_index(index, "gsm8k_faiss.index")
+            faiss.write_index(self.index, "gsm8k_faiss.index")
 
             with open("questions.json", "w") as f:
                 json.dump(questions, f)
@@ -143,7 +142,7 @@ class MathAgent:
 
         try:
             query_embedding = self.model.encode([query]).astype('float32')
-            D, I = index.search(query_embedding, k=top_k)
+            D, I = self.index.search(query_embedding, k=top_k)
 
             context_parts = []
             for i, idx in enumerate(I[0]):
@@ -334,4 +333,5 @@ if __name__ == "__main__":
     print(f"Answer: {result['answer']}")
     print(f"Success: {result['success']}")
     print(f"Used Context: {result['context_used']}")
+
 
