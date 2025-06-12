@@ -7,7 +7,7 @@ An interactive math tutor chatbot powered by the **Gemini API** and **GSM8K data
 ##  Features
 
 - 💬 Ask any math question in natural language
-- 🤖 AI-powered answers using Gemini Pro and few-shot reasoning
+- 🤖 AI-powered answers using Gemini  and few-shot reasoning
 - 🧠 Context-aware reasoning from the GSM8K dataset
 - 👍👎 Feedback collection for continuous improvement
 - 📄 CSV download of all feedback logs
