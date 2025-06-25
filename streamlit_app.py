@@ -92,14 +92,18 @@ def save_feedback(question, answer, feedback):
         'feedback': feedback
     }
     st.session_state.feedback_log.append(data)
+  
     try:
         df = pd.DataFrame([data])
         if os.path.exists("feedback_log.csv"):
             df.to_csv("feedback_log.csv", mode='a', header=False, index=False)
         else:
             df.to_csv("feedback_log.csv", mode='w', header=True, index=False)
+        st.write("✅ Logged feedback:", st.session_state.feedback_log[-1])
     except Exception as e:
         st.error(f"Feedback not saved: {e}")
+  
+
 
 
 def main():
@@ -176,9 +180,29 @@ def main():
             with st.spinner("Solving..."):
                 try:
                     result = st.session_state.math_agent.get_answer(user_input)
-                    # st.write("Debug result:", result)  # Remove this after testing
                     response = result.get("answer", "❌ No answer.")
                     st.markdown(response, unsafe_allow_html=False)
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                    col1, col2, _ = st.columns([1, 1, 4])
+                    with col1:
+                        if st.button("👍", key="like_latest"):
+                            user_msg = ""
+                            for prev_msg in reversed(st.session_state.messages[:-1]):
+                                if prev_msg["role"] == "user":
+                                    user_msg = prev_msg["content"]
+                                    break
+                            save_feedback(user_msg, response, "helpful")
+                            st.success("Thanks! 👍")
+                    
+                    with col2:
+                        if st.button("👎", key="dislike_latest"):
+                            user_msg = ""
+                            for prev_msg in reversed(st.session_state.messages[:-1]):
+                                if prev_msg["role"] == "user":
+                                    user_msg = prev_msg["content"]
+                                    break
+                            save_feedback(user_msg, response, "not_helpful")
+                            st.info("We'll improve 👎")
 
 
                     if result.get("context_used"):
@@ -194,28 +218,7 @@ def main():
                     response = f"❌ Error: {str(e)}"
                     st.error(response)
 
-            st.session_state.messages.append({"role": "assistant", "content": response})
-            col1, col2, _ = st.columns([1, 1, 4])
-            with col1:
-                    if st.button("👍", key="like_latest"):
-                        user_msg = ""
-                        for prev_msg in reversed(st.session_state.messages[:-1]):
-                            if prev_msg["role"] == "user":
-                                user_msg = prev_msg["content"]
-                                break
-                        save_feedback(user_msg, response, "helpful")
-                        st.success("Thanks! 👍")
-                
-            with col2:
-                    if st.button("👎", key="dislike_latest"):
-                        user_msg = ""
-                        for prev_msg in reversed(st.session_state.messages[:-1]):
-                            if prev_msg["role"] == "user":
-                                user_msg = prev_msg["content"]
-                                break
-                        save_feedback(user_msg, response, "not_helpful")
-                        st.info("We'll improve 👎")
-
+          
 
     # Footer
     st.markdown("---")
