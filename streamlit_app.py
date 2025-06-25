@@ -98,8 +98,9 @@ def save_feedback(question, answer, feedback):
             df.to_csv("feedback_log.csv", mode='a', header=False, index=False)
         else:
             df.to_csv("feedback_log.csv", mode='w', header=True, index=False)
-    except:
-        pass
+    except Exception as e:
+        st.error(f"Feedback not saved: {e}")
+
 
 def main():
     init_session_state()
@@ -147,12 +148,21 @@ def main():
             col1, col2, _ = st.columns([1, 1, 4])
             with col1:
                 if st.button("👍", key=f"like_{i}"):
-                    user_msg = st.session_state.messages[i-1]["content"]
+                    user_msg = ""
+                    for prev_msg in reversed(st.session_state.messages[:i]):
+                        if prev_msg["role"] == "user":
+                            user_msg = prev_msg["content"]
+                            break
                     save_feedback(user_msg, msg["content"], "helpful")
                     st.success("Thanks! 👍")
+    
             with col2:
                 if st.button("👎", key=f"dislike_{i}"):
-                    user_msg = st.session_state.messages[i-1]["content"]
+                    user_msg = ""
+                    for prev_msg in reversed(st.session_state.messages[:i]):
+                        if prev_msg["role"] == "user":
+                            user_msg = prev_msg["content"]
+                            break
                     save_feedback(user_msg, msg["content"], "not_helpful")
                     st.info("We'll improve 👎")
 
@@ -168,7 +178,8 @@ def main():
                     result = st.session_state.math_agent.get_answer(user_input)
                     # st.write("Debug result:", result)  # Remove this after testing
                     response = result.get("answer", "❌ No answer.")
-                    st.markdown(response)
+                    st.markdown(response, unsafe_allow_html=False)
+
 
                     if result.get("context_used"):
                         with st.expander("📚 Context Used"):
