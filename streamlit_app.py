@@ -69,8 +69,7 @@ def init_session_state():
         st.session_state.math_agent = None
     if 'feedback_log' not in st.session_state:
         st.session_state.feedback_log = []
-    if 'user_input' not in st.session_state:
-        st.session_state.user_input = ""
+    
 
 
 @st.cache_resource
@@ -174,11 +173,11 @@ def main():
                     st.info("We'll improve 👎")
 
     # User input
-    user_input = st.text_input("💬 Ask a math question:", value=st.session_state.user_input, key="user_input")
+    user_input = st.text_input("💬 Ask a math question:")
     if st.button("Ask") and user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
         display_chat_message("user", user_input)
-        st.session_state.user_input = ""  
+
 
         with st.chat_message("assistant"):
             with st.spinner("Solving..."):
