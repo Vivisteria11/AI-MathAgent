@@ -195,6 +195,27 @@ def main():
                     st.error(response)
 
             st.session_state.messages.append({"role": "assistant", "content": response})
+            col1, col2, _ = st.columns([1, 1, 4])
+            with col1:
+                    if st.button("👍", key="like_latest"):
+                        user_msg = ""
+                        for prev_msg in reversed(st.session_state.messages[:-1]):
+                            if prev_msg["role"] == "user":
+                                user_msg = prev_msg["content"]
+                                break
+                        save_feedback(user_msg, response, "helpful")
+                        st.success("Thanks! 👍")
+                
+            with col2:
+                    if st.button("👎", key="dislike_latest"):
+                        user_msg = ""
+                        for prev_msg in reversed(st.session_state.messages[:-1]):
+                            if prev_msg["role"] == "user":
+                                user_msg = prev_msg["content"]
+                                break
+                        save_feedback(user_msg, response, "not_helpful")
+                        st.info("We'll improve 👎")
+
 
     # Footer
     st.markdown("---")
