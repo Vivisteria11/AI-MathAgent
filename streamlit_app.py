@@ -69,6 +69,9 @@ def init_session_state():
         st.session_state.math_agent = None
     if 'feedback_log' not in st.session_state:
         st.session_state.feedback_log = []
+    if 'user_input' not in st.session_state:
+        st.session_state.user_input = ""
+
 
 @st.cache_resource
 def get_math_agent():
@@ -99,7 +102,7 @@ def save_feedback(question, answer, feedback):
             df.to_csv("feedback_log.csv", mode='a', header=False, index=False)
         else:
             df.to_csv("feedback_log.csv", mode='w', header=True, index=False)
-        st.write("✅ Logged feedback:", st.session_state.feedback_log[-1])
+        #st.write("✅ Logged feedback:", st.session_state.feedback_log[-1])
     except Exception as e:
         st.error(f"Feedback not saved: {e}")
   
@@ -127,15 +130,15 @@ def main():
         st.metric("Feedbacks", len(st.session_state.feedback_log))
 
         if st.session_state.feedback_log:
-            if st.button("📥 Download Feedback"):
-                df = pd.DataFrame(st.session_state.feedback_log)
-                csv = df.to_csv(index=False)
-                st.download_button(
-                    label="📄 Download CSV",
-                    data=csv,
-                    file_name=f"feedback_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                    mime="text/csv"
-                )
+           df = pd.DataFrame(st.session_state.feedback_log)
+           csv = df.to_csv(index=False)
+           st.download_button(
+                label="📄 Download CSV",
+                data=csv,
+                file_name=f"feedback_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                mime="text/csv"
+            )
+
 
     # Initialize agent
     if st.session_state.math_agent is None:
@@ -171,10 +174,11 @@ def main():
                     st.info("We'll improve 👎")
 
     # User input
-    user_input = st.text_input("💬 Ask a math question:")
+    user_input = st.text_input("💬 Ask a math question:", value=st.session_state.user_input, key="user_input")
     if st.button("Ask") and user_input:
-        display_chat_message("user", user_input)
         st.session_state.messages.append({"role": "user", "content": user_input})
+        display_chat_message("user", user_input)
+        st.session_state.user_input = ""  
 
         with st.chat_message("assistant"):
             with st.spinner("Solving..."):
