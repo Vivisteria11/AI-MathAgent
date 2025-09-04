@@ -318,7 +318,7 @@ if __name__ == "__main__":
         answers = json.load(f)
 
     # Step 2: Create the agent
-    agent = MathAgent(gemini_api_key="AIzaSyA-Y1bbM0aofvo_roKegn3Z_37eAw2ZpWc")
+    agent = MathAgent(gemini_api_key="api key")
 
     # Step 3: Manually inject the vector DB and data
     agent.index = index
